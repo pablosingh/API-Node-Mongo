@@ -55,7 +55,7 @@ app.post('/api/product', (req,res) => {
 	product.price = req.query.price;
 	product.category = req.query.category;
 	product.description = req.query.description;
-	
+
 
 	product.save( (err,productStored) => {
 		if (err){
@@ -70,11 +70,49 @@ app.post('/api/product', (req,res) => {
 } );
 
 app.put( '/api/product/:productId', (req,res) => {
+	let productId = req.params.productId;
+	let update = req.query;
+
+	Product.findByIdAndUpdate( productId, update, (err,productUpdated) => {
+		if (err) res.status(500).send({message: `Error al Actualizar: ${err}`});
+
+		/*
+		res.status(200).send({product: productUpdated});
+		El de arriba da el objeto anterior por eso se actualiza mas abajo......
+		//*/
+		/*
+		//Verificando los datos al enviar (abajo)
+		console.log('Update -');
+		console.log(update);
+		console.log('---------');
+		console.log('Producto Actualizado');
+		console.log(productUpdated);
+		console.log('---------');
+		console.log('body - ');
+		console.log(req.body);
+		console.log('---------');
+		console.log(req.query);
+		//*/
+		//console.log(productUpdated);
+	} );
+	Product.findById(productId, (err, product) => {
+		if (err) res.status(500).send({message: `Error: ${err}`});
+		res.status(200).send({product: product});
+	});
 
 } );
 
 app.delete ( '/api/product/:productId', (req,res) => {
+	let productId = req.params.productId;
+	
+	Product.findById(productId, (err, product) => {
+		if (err) res.status(500).send({message: `Error al borrar: ${err}`});
 
+		product.remove(err => {
+			if (err) res.status(500).send({message: `Error al borrar: ${err}`});
+			res.status(200).send({message: 'Producto Eliminado'});
+		});
+	});
 } );
 
 mongoose.connect('mongodb://localhost:27017/shop', (err,res) => {
