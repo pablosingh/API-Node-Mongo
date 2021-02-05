@@ -19,12 +19,24 @@ app.get('/hola/:name', (req,res) => {
 */
 
 app.get( '/api/product', (req,res) => {
-	res.status(200).send( {products:[]} );
-	//res.send(200, {products:[]});
+	Product.find( {}, (err,products) => {
+		if (err) return res.status(500).send({message: `Error en la peticion: ${err}`});
+		if (!products) return res.status(404).send({message: 'No hay productos'});
+
+		res.status(200).send( {products: products} );
+	});
 });
 
 app.get( '/api/product/:productId', (req,res) => {
+	let productId = req.params.productId;
+	
+	Product.findById(productId, (err, product) => {
+		if (err) return res.status(500).send({message: `Error en la peticion: ${err}`});
+		if (!product) return res.status(404).send({message: 'El producto no existe'});
 
+		res.status(200).send({ product: product });
+	});
+	//console.log(productId);
 } );
 
 app.post('/api/product', (req,res) => {
@@ -36,13 +48,14 @@ app.post('/api/product', (req,res) => {
 
 	console.log('POST /api/product');
 	console.log(req.query);
-
+	
 	let product = new Product();
 	product.name = req.query.name;
 	product.picture = req.query.picture;
 	product.price = req.query.price;
 	product.category = req.query.category;
 	product.description = req.query.description;
+	
 
 	product.save( (err,productStored) => {
 		if (err){
@@ -50,7 +63,9 @@ app.post('/api/product', (req,res) => {
 			res.status(500).send({message: `Error al salvar en la base de datos: ${err}`});
 		}
 		res.status(200).send({product: productStored});
+		console.log(product);
 		console.log('Exito al salvar');
+
 	} );
 } );
 
