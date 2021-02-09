@@ -17,8 +17,19 @@ function signUp (req,res){
 	});
 }
 
-function signIn (req,res) {
 
+function signIn (req,res) {
+	User.find( { email: req.body.email }, (err,user) => { 
+		if (err) return res.status(500).send({ message: `Error: ${err}`});// 500 error de servidor
+
+		if (!user) return res.status(404).send({ message: `No existe el User: ${user}`});//404 no existe
+
+		req.user = user;
+		res.status(200).send({
+			message: 'Logueado correctamente',
+			token: service.createToken(user)
+		});
+	});
 }
 
 module.exports = {
