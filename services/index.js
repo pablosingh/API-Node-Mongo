@@ -11,6 +11,8 @@ const jwt = require('jwt-simple');
 const moment = require('moment');
 const config = require('../config');
 
+//---------------------------------------------------------------------------------------------
+
 function createToken (user) {
 	const payLoad = {
 		sub: user._id,
@@ -20,9 +22,11 @@ function createToken (user) {
 	return jwt.encode( payLoad, config.SECRET_TOKEN );
 }
 
+//---------------------------------------------------------------------------------------------
+
 function decodeToken (token) {
 	const decoded = new Promise( (resolve, reject) => {
-		try {
+		try{
 			const payload = jwt.decode(token, config.SECRET_TOKEN);
 
 			if (payload.exp <= moment().unix()) {
@@ -33,7 +37,8 @@ function decodeToken (token) {
 			}
 
 			resolve( payload.sub );
-		} catch (err) {
+			
+		}catch (err) {
 			reject( {
 				status: 500,
 				message: 'Invalid Token'
@@ -43,6 +48,8 @@ function decodeToken (token) {
 	
 	return decoded;
 }
+
+//---------------------------------------------------------------------------------------------
 
 module.exports = {
 	createToken,

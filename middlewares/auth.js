@@ -3,7 +3,9 @@
 //const moment = require('moment');
 //const jwt = require('jwt-simple');
 //const config = require('../config');
-const services = require('../srvices');
+const services = require('../services');
+
+//---------------------------------------------------------------------------------------------
 
 function isAuth (req,res,next) {
 	if (!req.headers.authorization){
@@ -12,14 +14,17 @@ function isAuth (req,res,next) {
 	}
 	const token = req.headers.authorization.split(' ')[1]; //Separamos y obtenemos el token
 
-	services.decodeToken(token);
+	services.decodeToken(token)
 		.then( response => { 
 			req.user = response;
 			next();
-		} );
+		} )
 		.catch( response => {
 			req.status(response.status);
 		} );
 }
+
+
+//---------------------------------------------------------------------------------------------
 
 module.exports = isAuth;
